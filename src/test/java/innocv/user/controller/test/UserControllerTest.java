@@ -15,12 +15,9 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 
-import innocv.general.mapper.OrikaMapper;
 import innocv.general.model.DataDTO;
 import innocv.user.controller.UserController;
 import innocv.user.dto.UserDTO;
-import innocv.user.entity.User;
-import innocv.user.repository.UserRepository;
 import innocv.user.service.UserServiceImpl;
 
 public class UserControllerTest {
@@ -32,20 +29,11 @@ public class UserControllerTest {
 	private UserServiceImpl userService;
 
 	@Mock
-	private UserRepository userRepository;
+	private BindingResult bindingResult;
 
 	@Mock
 	private UserDTO userDTOMock;
 
-	@Mock
-	private BindingResult bindingResult;
-	
-	@Mock
-	private OrikaMapper orikaMapper;
-
-	@Mock
-	private User user;
-	
 	private UserDTO userDTO;
 	
 	private List<UserDTO> listUserDTO;
@@ -62,7 +50,6 @@ public class UserControllerTest {
 		Mockito.when(userService.getListUsers()).thenReturn(listUserDTO);
 		Mockito.when(userService.updateUser(userDTO, bindingResult)).thenReturn(getUserDTOUpdate(userDTO));
 		Mockito.when(userService.deleteUser(1)).thenReturn(new DataDTO<String>("User deteled"));
-		
 	}
 
 	@Test

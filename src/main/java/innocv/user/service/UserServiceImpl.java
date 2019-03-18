@@ -1,5 +1,7 @@
 package innocv.user.service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,38 +27,31 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private OrikaMapper orikaMapper;
 
-	@Autowired
-	private User user;
-
 	@Override
 	public UserDTO createUser(UserDTO userDTO, BindingResult errors) {
 
 		UserDTO userCreate = null;
-		
+
 		if(InnocvUtils.validOK(errors)) {
 			throw new InnocvException(HttpStatus.NOT_ACCEPTABLE, InnocvUtils.getErrorsValidation(errors));
 		}
 
-		try {
-			user = orikaMapper.map(userDTO, User.class);
-			user = userRepository.save(user);
-			userCreate = getUser(user.getIdUser());
-		} catch (Exception e) {
-			throw new InnocvException(HttpStatus.INTERNAL_SERVER_ERROR, InnocvUtils.getCatchErrors(e.getMessage()));
-		}
+		User user = orikaMapper.map(userDTO, User.class);
+		user = userRepository.save(user);
+		userCreate = orikaMapper.map(user, UserDTO.class);
 
 		return userCreate;
 	}
 
 	@Override
 	public UserDTO getUser(int id) {
-		UserDTO userDTO = getOptionalUser(id).get();
+		UserDTO userDTO = getOptionalUser(id);
 		return userDTO;
 	}
 
 	@Override
 	public List<UserDTO> getListUsers() {
-		List<UserDTO> listUsersDTO = getOptionalListUser().get();
+		List<UserDTO> listUsersDTO = getOptionalListUser();
 		return listUsersDTO;
 	}
 
@@ -67,44 +62,39 @@ public class UserServiceImpl implements UserService {
 			throw new InnocvException(HttpStatus.NOT_ACCEPTABLE, InnocvUtils.getErrorsValidation(errors));
 		}
 
-		UserDTO updateUser = getUser(userDTO.getIdUser());
-		
-		try {
-			user = orikaMapper.map(updateUser, User.class);
-			user = userRepository.save(user);
-		} catch (Exception e) {
-			throw new InnocvException(HttpStatus.INTERNAL_SERVER_ERROR, InnocvUtils.getCatchErrors(e.getMessage()));
-		}
-		
-		updateUser = getUser(userDTO.getIdUser());
+		existUser(userDTO.getIdUser());
+		UserDTO userUpdate = null;
 
-		return updateUser;
+		User user = orikaMapper.map(userDTO, User.class);
+		user = userRepository.save(user);
+		userUpdate = orikaMapper.map(user, UserDTO.class);
+
+		return userUpdate;
 	}
 
 	@Override
 	public DataDTO<String> deleteUser(int id) {
-		
-		boolean userDelete = existUser(id);
-		
-		if(userDelete) {
-			user = orikaMapper.map(getUser(id), User.class);
-			userRepository.delete(user);
-		}
-		
+
+		existUser(id);
+
+		User user = orikaMapper.map(getOptionalUser(id), User.class);
+		userRepository.delete(user);
+
 		return new DataDTO<String>("Te user with the id: " + id + ", has been successfully deleted.");
 	}
 
 	/**
+	 * Method to verify that a user exists by id
 	 * 
 	 * @param id
 	 * @return Optional of User
 	 */
-	private Optional<UserDTO> getOptionalUser(int id) {
+	private UserDTO getOptionalUser(int id) {
 		Optional<User> optUser = Optional.of(userRepository.findById(id).get());
-		Optional<UserDTO> optUserDTO = Optional.empty();
+		UserDTO optUserDTO = null;
 
 		if(optUser.isPresent()) {
-			optUserDTO = Optional.of(orikaMapper.map(optUser, UserDTO.class));
+			optUserDTO = orikaMapper.map(optUser.get(), UserDTO.class);
 		} else {
 			throw new InnocvException(HttpStatus.NOT_FOUND, "The user with the "+ id +" doesn't exist");
 		}
@@ -113,21 +103,22 @@ public class UserServiceImpl implements UserService {
 	}
 
 	/**
+	 * Method to verify that the list of users is not empty
 	 * 
 	 * @return User list optional
 	 */
-	private Optional<List<UserDTO>> getOptionalListUser() {
+	private List<UserDTO> getOptionalListUser() {
 		List<User> optListUser = Optional.of(userRepository.findAll()).get();
-		Optional<List<UserDTO>> optListUserDTO = Optional.empty();
+		List<UserDTO> optListUserDTO = new ArrayList<>();
 
 		if(optListUser.isEmpty()) {
 			throw new InnocvException(HttpStatus.NOT_FOUND, "The user list is empty");
 		}
 
-		optListUserDTO = Optional.of(orikaMapper.mapAsList(optListUser, UserDTO.class));
+		optListUserDTO = orikaMapper.mapAsList(Arrays.asList(optListUser), UserDTO.class);
 		return optListUserDTO;
 	}
-	
+
 	/**
 	 * Method for checking that a user exists
 	 * 
@@ -137,13 +128,13 @@ public class UserServiceImpl implements UserService {
 	private boolean existUser(int id) {
 		boolean exist = false;
 		Optional<Boolean> optExist = Optional.of(userRepository.existsById(id));
-		
+
 		if(optExist.isPresent()) {
 			exist = true;
 		} else {
 			throw new InnocvException(HttpStatus.NOT_FOUND, "The user with the "+ id +" doesn't exist");
 		}
-		
+
 		return exist;
 	}
 
