@@ -103,6 +103,12 @@ public class UserServiceImpl implements UserService {
 		return new DataDTO<String>("Te user with the id: " + id + ", has been successfully deleted.");
 	}
 	
+	/**
+	 * Method to verify a user exists by id
+	 * 
+	 * @param id
+	 * @return User
+	 */
 	private User getFindUser(int id) {
 		log.debug("Within the method getFindUser");
 
@@ -115,7 +121,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	/**
-	 * Method to verify that a user exists by id
+	 * Method to obtain a user by id
 	 * 
 	 * @param id
 	 * @return Optional of User
