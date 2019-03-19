@@ -8,6 +8,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,8 +35,8 @@ public class UserController {
 		return responseEntity;
 	}
 	
-	@GetMapping
-	public ResponseEntity<DataDTO<UserDTO>> getUser(int id) {
+	@GetMapping("/{id}")
+	public ResponseEntity<DataDTO<UserDTO>> getUser(@PathVariable int id) {
 		
 		DataDTO<UserDTO> dataUser = new DataDTO<UserDTO>(userServiceImpl.getUser(id));
 		ResponseEntity<DataDTO<UserDTO>> responseEntity = ResponseEntity.ok().body(dataUser);
@@ -52,17 +53,17 @@ public class UserController {
 		return responseEntity;
 	}
 	
-	@PutMapping
-	public ResponseEntity<DataDTO<UserDTO>> updateUser(@Validated @RequestBody UserDTO userDTO, BindingResult errors) {
+	@PutMapping("/{id}")
+	public ResponseEntity<DataDTO<UserDTO>> updateUser(@PathVariable int id, @Validated @RequestBody UserDTO userDTO, BindingResult errors) {
 		
-		DataDTO<UserDTO> dataUpdate = new DataDTO<UserDTO>(userServiceImpl.updateUser(userDTO, errors));
+		DataDTO<UserDTO> dataUpdate = new DataDTO<UserDTO>(userServiceImpl.updateUser(id, userDTO, errors));
 		ResponseEntity<DataDTO<UserDTO>> responseEntity = ResponseEntity.ok().body(dataUpdate);
 		
 		return responseEntity;
 	}
 	
-	@DeleteMapping
-	public ResponseEntity<DataDTO<String>> deleteUser(int id) {
+	@DeleteMapping("/{id}")
+	public ResponseEntity<DataDTO<String>> deleteUser(@PathVariable int id) {
 		
 		DataDTO<String> dataDelete = userServiceImpl.deleteUser(id);
 		ResponseEntity<DataDTO<String>> responseEntity = ResponseEntity.ok().body(dataDelete);

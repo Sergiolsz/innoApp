@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -76,9 +75,9 @@ public class UserServiceTest {
 	@Test
 	void testGetUser() {
 		given(orikaMapper.map(user, UserDTO.class)).willReturn(userDTO);
-		given(userRepository.findById(userDTO.getIdUser())).willReturn(Optional.of(user));
+		given(userRepository.findById(userDTO.getId())).willReturn(Optional.ofNullable(user));
 		
-		UserDTO getUser = userServiceImpl.getUser(userDTO.getIdUser());
+		UserDTO getUser = userServiceImpl.getUser(userDTO.getId());
 		
 		assertNotNull(getUser);
 	}
@@ -95,19 +94,20 @@ public class UserServiceTest {
 	@Test
 	void testUpdateUser() {
 		given(orikaMapper.map(userDTOUpdate, User.class)).willReturn(user);
-		given(orikaMapper.map(user, UserDTO.class)).willReturn(userDTOUpdate);
+		given(userRepository.findById(1)).willReturn(Optional.ofNullable(user));
 		given(userRepository.save(user)).willReturn(user);
 		
-		UserDTO updateUser = userServiceImpl.updateUser(userDTO, bindingResult);
+		UserDTO updateUser = userServiceImpl.updateUser(user.getId(), userDTO, bindingResult);
 		
 		assertNotNull(updateUser);
 	}
 
 	@Test
 	void testDeleteUser() {
-		given(userRepository.findById(userDTO.getIdUser())).willReturn(Optional.of(user));
+		given(userRepository.findById(userDTO.getId())).willReturn(Optional.of(user));
+		given(userRepository.existsById(userDTO.getId())).willReturn(true);
 		
-		DataDTO<String> deleteUser = userServiceImpl.deleteUser(userDTO.getIdUser());
+		DataDTO<String> deleteUser = userServiceImpl.deleteUser(userDTO.getId());
 		
 		assertNotNull(deleteUser);
 	}
@@ -121,7 +121,7 @@ public class UserServiceTest {
 		});
 		
 		Throwable updateException = assertThrows(InnocvException.class, ()-> {
-			userServiceImpl.updateUser(userDTO, bindingResult);
+			userServiceImpl.updateUser(1, userDTO, bindingResult);
 		});
 		
 		assertEquals(InnocvException.class, createException.getClass());
@@ -131,12 +131,12 @@ public class UserServiceTest {
 	@Test
 	void testOptionalErrors() {	
 		given(userRepository.save(user)).willReturn(user);
-		//given(userServiceImpl.getUser(10)).willReturn(new UserDTO());
+		given(userRepository.findById(10)).willReturn(Optional.empty());
 		given(userRepository.existsById(5)).willReturn(false);
 		
-		/*Throwable UserException = assertThrows(InnocvException.class, ()-> {
+		Throwable UserException = assertThrows(InnocvException.class, ()-> {
 			userServiceImpl.getUser(10);
-		});*/
+		});
 		Throwable listUserException = assertThrows(InnocvException.class, ()-> {
 			userServiceImpl.getListUsers();
 		});
@@ -144,14 +144,14 @@ public class UserServiceTest {
 			userServiceImpl.deleteUser(0);
 		});
 		
-		//assertEquals(InnocvException.class, UserException.getClass());
+		assertEquals(InnocvException.class, UserException.getClass());
 		assertEquals(InnocvException.class, listUserException.getClass());
 		assertEquals(InnocvException.class, existUserException.getClass());
 	}
 
 	private static User getUser() {
 		User user = new User();
-		user.setIdUser(0);
+		user.setId(1);
 		user.setName("Sergio");
 		user.setLongName("Liébanas Rodríguez");
 		user.setAge(36);

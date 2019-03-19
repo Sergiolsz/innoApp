@@ -3,11 +3,9 @@ package innocv.general.exception;
 import org.springframework.stereotype.Component;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @Component
 public class SubErrorMessage {
@@ -15,4 +13,5 @@ public class SubErrorMessage {
 	private String errorField;
 	private String errorMessage;
 	
+	public SubErrorMessage() {}
 }

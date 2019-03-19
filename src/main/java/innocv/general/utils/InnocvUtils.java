@@ -42,14 +42,11 @@ public class InnocvUtils {
 				.stream()
 				.map(x -> new SubErrorMessage(x.getObjectName().toString(), x.getDefaultMessage().toString()))
 				.collect(Collectors.toList());
+		
 		log.error("List erros: " + listErrors);
 		ErrorMessage error = new ErrorMessage(listErrors);
+		
 		return error;
 	}
 	
-	
-	public static final Object getCatchErrors(Object object) {
-		return object;
-	}
-
 }

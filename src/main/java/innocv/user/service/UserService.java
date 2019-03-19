@@ -15,7 +15,7 @@ public interface UserService {
 	
 	public List<UserDTO> getListUsers();
 	
-	public UserDTO updateUser(UserDTO userDTO, BindingResult errors);
+	public UserDTO updateUser(int id, UserDTO userDTO, BindingResult errors);
 	
 	public DataDTO<String> deleteUser(int id);
 }

@@ -2,8 +2,9 @@ package innocv.general.mapper;
 
 import org.springframework.stereotype.Component;
 
+import innocv.user.dto.UserDTO;
+import innocv.user.entity.User;
 import ma.glasnost.orika.MapperFactory;
-import ma.glasnost.orika.converter.ConverterFactory;
 import ma.glasnost.orika.impl.ConfigurableMapper;
 
 
@@ -11,16 +12,12 @@ import ma.glasnost.orika.impl.ConfigurableMapper;
 public class OrikaMapper extends ConfigurableMapper {
 
 	protected void configure(MapperFactory factory) {
-		ConverterFactory converterFactory = factory.getConverterFactory();
-		converterFactory.registerConverter("dateConverter", new OrikaDateConverter("dd/MM/yyyy"));
-	/*	factory.classMap(EntradaModel.class, UsuarioModel.class)
-		.field("autor", "nombre")
+		factory.classMap(User.class, UserDTO.class)
 		.byDefault()
 		.register();
-		factory.classMap(User.class, UserDTO.class)
-		.fieldMap("fechaPublicacion", "fechaPublicacion").converter("dateConverter").add()
+		factory.classMap(UserDTO.class, User.class)
 		.byDefault()
-		.register();*/
+		.register();
 	}
 
 }
